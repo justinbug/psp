@@ -23,8 +23,12 @@ jobs:
           echo "PSPDEV=/usr/local/pspdev" >> $GITHUB_ENV
           echo "PATH=/usr/local/pspdev/bin:$PATH" >> $GITHUB_ENV
 
-      - name: Install OSLib
-        run: psp-pacman --noconfirm -S pspdev-oslib
+      - name: Build and install OSLib from source
+        run: |
+          git clone https://github.com/pspdev/oslib.git
+          cd oslib
+          make -f Makefile PSP=1
+          make -f Makefile PSP=1 install
 
       - name: Download stb_vorbis
         run: |
