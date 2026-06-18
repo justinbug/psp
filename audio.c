@@ -324,7 +324,7 @@ static int ola_resample(const float *in_buf,  int n_in,
     int out_count = (int)(n_in / ratio);
     if (out_count > n_out_max) out_count = n_out_max;
 
-
+    float pos = 0.0f;
     for (int i = 0; i < out_count; i++) {
         int   idx  = (int)pos;
         float frac = pos - idx;
