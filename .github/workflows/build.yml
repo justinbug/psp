@@ -23,9 +23,7 @@ jobs:
           echo "PATH=/usr/local/pspdev/bin:$PATH" >> $GITHUB_ENV
 
       - name: Install git and ca-certificates
-        run: |
-          apt-get update -qq
-          apt-get install -y -qq git ca-certificates
+        run: apk add --no-cache git ca-certificates
 
       - name: Build and install OSLib from source
         run: |
@@ -35,8 +33,7 @@ jobs:
           make PSP=1 install
 
       - name: Download stb_vorbis
-        run: |
-          wget -q https://raw.githubusercontent.com/nothings/stb/master/stb_vorbis.c
+        run: wget -q https://raw.githubusercontent.com/nothings/stb/master/stb_vorbis.c
 
       - name: Build
         run: make
