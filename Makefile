@@ -1,7 +1,7 @@
 TARGET  = psp-music-player
 OBJS    = main.o player.o audio.o ui.o
 
-CFLAGS  = -O2 -G0 -Wall -mfpu=vfpu -mips2 \
+CFLAGS  = -O2 -G0 -Wall \
           -I$(PSPSDK)/include \
           -I$(PSPDEV)/include \
           -DPSP_FW_VERSION=371
