@@ -31,9 +31,8 @@
 #include <math.h>
 
 /* ── stb_vorbis (OGG) ──────────────────────────────────────────── */
-#define STB_VORBIS_NO_STDIO 0
 #define STB_VORBIS_NO_PUSHDATA_API
-#include "stb_vorbis.c"   // drop the single-header lib beside this file
+#include "stb_vorbis.c"
 
 /* ── libmad (MP3) — available in PSPSDK ────────────────────────── */
 #include <mad.h>
@@ -196,13 +195,13 @@ void *audio_open_decoder(const char *path) {
         dec->mad_buf = (unsigned char*)malloc(FILE_BUF_SIZE);
     } else if (dec->fmt == FMT_OGG) {
         int err = 0;
-        dec->vorbis = stb_vorbis_open_file(dec->fp, 0, &err, NULL);
+        dec->vorbis = stb_vorbis_open_filename((char*)path, &err, NULL);
         if (!dec->vorbis || err) {
             fclose(dec->fp); free(dec->pcm_buf);
             free(dec->dsp_inbuf); free(dec->dsp_outbuf);
             free(dec); return NULL;
         }
-        stb_vorbis_info vi = stb_vorbis_get_info(dec->vorbis);
+
         dec->duration_sec  = (int)stb_vorbis_stream_length_in_seconds(dec->vorbis);
         // Try to grab tags
         stb_vorbis_comment vc = stb_vorbis_get_comment(dec->vorbis);
@@ -325,7 +324,7 @@ static int ola_resample(const float *in_buf,  int n_in,
     int out_count = (int)(n_in / ratio);
     if (out_count > n_out_max) out_count = n_out_max;
 
-    float pos = 0.0f;
+
     for (int i = 0; i < out_count; i++) {
         int   idx  = (int)pos;
         float frac = pos - idx;
@@ -367,7 +366,7 @@ static int pitch_shift(const float *in_buf,  int n_in,
     int pass1_out = (int)(n_in * ratio);
     if (pass1_out > tmp_size) pass1_out = tmp_size;
 
-    float pos = 0.0f;
+
     for (int i = 0; i < pass1_out; i++) {
         int   idx  = (int)(i * factor);
         float frac = (i * factor) - idx;
@@ -449,7 +448,7 @@ static void decode_chunk(Decoder *dec, int want_samples) {
    audio_update — called once per frame
    ───────────────────────────────────────────────────────────────── */
 void audio_update(PlayerState *ps) {
-    if (!ps->decoder || !ps->playing || ps->paused) return;
+    if (!ps->decoder || ps->paused) return;
 
     Decoder *dec = (Decoder*)ps->decoder;
 
