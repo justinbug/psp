@@ -1,0 +1,49 @@
+name: Build PSP Homebrew
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  # Also lets you trigger a build manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: pspdev/pspdev:latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up pspdev environment
+        run: |
+          echo "PSPDEV=/usr/local/pspdev" >> $GITHUB_ENV
+          echo "PATH=/usr/local/pspdev/bin:$PATH" >> $GITHUB_ENV
+
+      - name: Install OSLib
+        run: psp-pacman --noconfirm -S pspdev-oslib
+
+      - name: Download stb_vorbis
+        run: |
+          wget -q https://raw.githubusercontent.com/nothings/stb/master/stb_vorbis.c
+
+      - name: Build
+        run: make
+
+      - name: Upload EBOOT.PBP as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: EBOOT
+          path: EBOOT.PBP
+          if-no-files-found: error
+
+      # Creates a GitHub Release with the EBOOT attached when you push a tag
+      # e.g. git tag v1.0 && git push origin v1.0
+      - name: Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: EBOOT.PBP
