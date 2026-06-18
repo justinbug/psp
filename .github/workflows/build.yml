@@ -22,15 +22,8 @@ jobs:
           echo "PSPDEV=/usr/local/pspdev" >> $GITHUB_ENV
           echo "PATH=/usr/local/pspdev/bin:$PATH" >> $GITHUB_ENV
 
-      - name: Install git and ca-certificates
-        run: apk add --no-cache git ca-certificates
-
-      - name: Build and install OSLib from source
-        run: |
-          git clone https://github.com/pspdev/oslib.git
-          cd oslib
-          make PSP=1
-          make PSP=1 install
+      - name: Install apk deps
+        run: apk add --no-cache wget
 
       - name: Download stb_vorbis
         run: wget -q https://raw.githubusercontent.com/nothings/stb/master/stb_vorbis.c
@@ -38,7 +31,7 @@ jobs:
       - name: Build
         run: make
 
-      - name: Upload EBOOT.PBP as artifact
+      - name: Upload EBOOT.PBP
         uses: actions/upload-artifact@v4
         with:
           name: EBOOT
